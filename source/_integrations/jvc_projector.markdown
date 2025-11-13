@@ -13,6 +13,8 @@ ha_domain: jvc_projector
 ha_platforms:
   - binary_sensor
   - remote
+  - select
+  - sensor
 ha_integration_type: device
 ---
 
@@ -20,13 +22,31 @@ The JVC Projector integration allows for the automation of [JVC Projectors](http
 
 ## Supported models
 
-This integration is intended for the automation of any modern JVC Projector with a LAN network port.
+This integration is intended for the automation of any modern JVC Projector with a network port.
+
+## Prerequisites
+
+JVC is requiring newer 2024+ models to use a user-generated password to access the network port for security reasons.
+
+To set up these models:
+
+1. Set a password on the projector's network setup page.
+2. Use this password when adding the JVC Projector integration in Home Assistant.
+
+### Password hashing for newer models (NZ800 and NZ900)
+
+For newer projector models (NZ800 and NZ900), the password needs to be hashed before being used in Home Assistant. Here's how to generate the correct hash:
+
+1. Set a password in the projector (for example, "1234567890").
+2. Append the string "JVCKWPJ" to your password (for example, "1234567890JVCKWPJ").
+3. Generate a SHA256 hash of the resulting string using an online tool like [SHA256 Hash Generator](https://emn178.github.io/online-tools/sha256.html).
+4. Use the generated hash as the password when adding the JVC Projector integration in Home Assistant.
 
 {% include integrations/config_flow.md %}
 
 ## Remote
 
-The JVC Projector remote platform will create a [Remote](/integrations/remote/) entity for the device. This entity allows you to send the following commands via the [remote.send_command](/integrations/remote/) service.
+The JVC Projector remote platform will create a [Remote](/integrations/remote/) entity for the device. This entity allows you to send the following commands via the [remote.send_command](/integrations/remote/) action.
 
 - `menu`
 - `up`
@@ -61,5 +81,31 @@ The JVC Projector remote platform will create a [Remote](/integrations/remote/) 
 
 ### Binary sensor
 
-The status reported is:
-- **Power on** is **True** when the projector is either in status **on** or **warming**.
+The following sensor types are supported:
+
+- Power on is True when projector is in status "on", "warming"
+
+### Sensor
+
+Introduces two sensors to detect Power Status and HDMI Input.
+
+Detailed Power Status values:
+
+- `standby`
+- `on`
+- `warming`
+- `cooling`
+- `error`
+
+Please note that if the projector is off, it will not respond to remote polling and will show as *unavailable*.
+
+Detailed HDMI Input values:
+
+- `hdmi1`
+- `hdmi2`
+
+### Selects
+
+The following Select entities are added. They allow changing the device state from a list of options.
+
+- `input`

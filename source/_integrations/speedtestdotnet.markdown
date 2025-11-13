@@ -22,7 +22,7 @@ The Speedtest.net integration uses the [Speedtest.net](https://speedtest.net/) w
 
 Most Speedtest.net servers require TCP port 8080 outbound to function. Without this port open you may experience significant delays or no results at all. See note on their [help page](https://www.speedtest.net/help).
 
-By default, a speed test will be run every hour. You can disable polling using system options and use the `update_entity` service to automate the speed test frequency.
+By default, a speed test will be run every hour. You can disable polling using system options and use the `update_entity` action to automate the speed test frequency.
 
 {% include common-tasks/define_custom_polling.md %}
 
@@ -49,19 +49,37 @@ In this section you will find some real-life examples of how to use this integra
 ```yaml
 # Example configuration.yaml entry
 automation:
-  - alias: "Internet Speed Glow Connect Great"
-    trigger:
-      - platform: template
-        value_template: "{{ states('sensor.speedtest_download')|float >= 10 }}"
-    action:
-      - service: shell_command.green
+  - alias: Turn On Green Light When Download Speed Is Good
+    description: >-
+      This automation turns on the Yeelight bulb with a green color when the
+      download speed exceeds 10 megabits per second.
+      It ensures that the light is an indicator of the health of your
+      network connection.
+    triggers:
+      - trigger: template
+        value_template: "{{ states('sensor.speedtest_download') | float >= 10 }}"
+    actions:
+      - action: light.turn_on
+        target:
+          entity_id: light.yeelight_bulb
+        data:
+          rgb_color: [0, 100, 0]
 
-  - alias: "Internet Speed Glow Connect Poor"
-    trigger:
-      - platform: template
-        value_template: "{{ states('sensor.speedtest_download')|float < 10 }}"
-    action:
-      - service: shell_command.red
+  - alias: Turn On Red Light When Download Speed Is Poor
+    description: >-
+      This automation turns on the Yeelight bulb with a red color when the
+      download speed drops below 10 megabits per second.
+      It ensures that the light is an indicator of the health of your
+      network connection.
+    triggers:
+      - trigger: template
+        value_template: "{{ states('sensor.speedtest_download') | float < 10 }}"
+    actions:
+      - action: light.turn_on
+        target:
+          entity_id: light.yeelight_bulb
+        data:
+          rgb_color: [255, 0, 0]
 ```
 
 {% endraw %}

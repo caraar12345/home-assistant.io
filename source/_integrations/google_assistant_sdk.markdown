@@ -2,6 +2,7 @@
 title: Google Assistant SDK
 description: Instructions on how to use Google Assistant SDK in Home Assistant.
 ha_category:
+  - Notifications
   - Voice
 ha_iot_class: Cloud Polling
 ha_release: 2023.1
@@ -11,8 +12,8 @@ ha_codeowners:
   - '@tronikos'
 ha_integration_type: service
 ha_platforms:
+  - diagnostics
   - notify
-ha_quality_scale: platinum
 google_dev_console_link: https://console.developers.google.com/apis/api/embeddedassistant.googleapis.com/overview
 api: Google Assistant API
 api_link: https://console.developers.google.com/apis/api/embeddedassistant.googleapis.com/overview
@@ -114,7 +115,7 @@ This guide is for advanced users only. It requires creating an OAuth client ID o
 
 {% details "Enable personal results" %}
 
-1. Go to  **{% my developer_services title="Developer Tools > Services" %}** and issue a query that requires personal results, for example call `google_assistant_sdk.send_text_command` with `command: "what is my name"`
+1. Go to  **{% my developer_services title="Developer Tools > Actions" %}** and issue a query that requires personal results, for example call `google_assistant_sdk.send_text_command` with `command: "what is my name"`
 2. On your phone, you should receive a notification **Allow personal answers** **Allow Google Assistant to answer your questions about your calendar, trips, and more**.
 3. DO NOT tap on **ALLOW** (it won't work until you enter a device name). Instead, tap on the notification text.
 4. If the app doesn't open, you need to retry on a device running Android 12. If you don't have such a device, you can use an Android emulator.
@@ -129,7 +130,9 @@ If you have an error with your credentials you can delete them in the [Applicati
 
 If commands don't work try removing superfluous words such as "the". E.g. "play rain sounds on bedroom speaker" instead of "play rain sounds on the bedroom speaker".
 
-If broadcasting doesn't work, make sure: the speakers aren't in do not disturb mode, the Home Assistant server is in the same network as the speakers, and IPv6 is disabled in the router.
+If commands to a specific device (like streaming a camera to a Google TV) fail, you may need to enable "Personal Results" on that device itself. For example, on a Google TV or Chromecast with Google TV, this setting may be located under `Settings > Privacy > Google Assistant > Personal Results`. This may be required in addition to enabling it in the Google Home app.
+
+If broadcasting doesn't work, make sure: the speakers aren't in do not disturb mode, the Home Assistant server is in the same network as the speakers.
 
 The easiest way to check if the integration is working is to check [My Google Activity](https://myactivity.google.com/myactivity) for the issued commands and their responses.
 
@@ -139,7 +142,7 @@ The easiest way to check if the integration is working is to check [My Google Ac
 - If you see the issued commands in [My Google Activity](https://myactivity.google.com/myactivity), the integration is working fine. If the commands don't have the expected outcome, don't open an issue in the Home Assistant Core project or the [underlying library](https://github.com/tronikos/gassist_text). You should instead report the issue directly to Google [here](https://github.com/googlesamples/assistant-sdk-python/issues). Examples of known Google Assistant API issues:
   - Media playback commands (other than play news, play podcast, play white noise, or play rain sounds) don't work.
   - Routines don't work.
-  - Broadcast doesn't work with IPv6.
+  - Google Assistant automations that use `assistant.event.OkGoogle` as a starter cannot be triggered.
   - Broadcast to specific rooms often doesn't work for non-English languages.
   - Commands that need to verify your identity through voice match do not work.
 
@@ -147,37 +150,47 @@ The easiest way to check if the integration is working is to check [My Google Ac
 
 On the configure page, you can set the language code of the interactions with Google Assistant. If not configured, the integration picks one based on Home Assistant's configured language and country. Supported languages are listed [here](https://developers.google.com/assistant/sdk/reference/rpc/languages).
 
-## Services
+## Actions
 
-### Service `google_assistant_sdk.send_text_command`
+### Send text command
 
-You can use the service `google_assistant_sdk.send_text_command` to send commands to Google Assistant.
+You can use the `google_assistant_sdk.send_text_command` action to send commands to Google Assistant.
 
-| Service data attribute | Optional | Description | Example |
-| ---------------------- | -------- | ----------- | --------|
-| `command`              | no       | Command(s) to send to Google Assistant. | turn off kitchen TV |
-| `media_player`         | yes      | Name(s) of media player entities to play response on | media_player.living_room_speaker |
+| Data attribute | Optional | Description |
+| ---------------------- | -------- | ----------- |
+| `command`              | no       | Command(s) to send to Google Assistant. |
+| `media_player`         | yes      | Name(s) of media player entities to play the Google Assistant's audio response on. This does **not** target the device for the command itself. |
 
 Examples:
 
 ```yaml
-service: google_assistant_sdk.send_text_command
+action: google_assistant_sdk.send_text_command
 data:
   command: "turn off kitchen TV"
 ```
 
 ```yaml
-# Say a joke on the living room speaker
-service: google_assistant_sdk.send_text_command
+# Say a joke on the living room speaker. The `media_player` entity receives the audio response.
+action: google_assistant_sdk.send_text_command
 data:
   command: "tell me a joke"
   media_player: media_player.living_room_speaker
 ```
 
+```yaml
+# Stream a camera to a Chromecast-enabled TV or display.
+# The target device ("living room tv") must be part of the command itself.
+action: google_assistant_sdk.send_text_command
+data:
+  command: "show the front door camera on the living room tv"
+```
+
+Note: To control a specific device, like streaming a camera to a TV, you must include the device's name (as known by Google Assistant) in the text `command`. The `media_player` parameter is only used for playing back Google Assistant's audio response and will not direct the video stream.
+
 You can send multiple commands in the same conversation context which is useful to unlock doors or open covers that need a PIN. Example:
 
 ```yaml
-service: google_assistant_sdk.send_text_command
+action: google_assistant_sdk.send_text_command
 data:
   command:
     - "open the garage door"
@@ -187,7 +200,7 @@ data:
 You can get responses. Example:
 
 ```yaml
-service: google_assistant_sdk.send_text_command
+action: google_assistant_sdk.send_text_command
 data:
   command:
     - "tell me a joke"
@@ -206,11 +219,11 @@ responses:
       The drumsticks 🍗
 ```
 
-### Service `notify.google_assistant_sdk`
+### Action `notify.google_assistant_sdk`
 
-You can use the service `notify.google_assistant_sdk` to broadcast messages to Google Assistant speakers and displays without interrupting music/video playback.
+You can use the `notify.google_assistant_sdk` action to broadcast messages to Google Assistant speakers and displays without interrupting music/video playback.
 
-| Service data attribute | Optional | Description                 | Example                      |
+| Data attribute | Optional | Description                 | Example                      |
 | ---------------------- | -------- | --------------------------- | ---------------------------- |
 | `message`              | no       | Message to broadcast.       | someone is at the front door |
 | `target`               | yes      | Rooms (in Google Assistant) | bedroom                      |
@@ -218,7 +231,7 @@ You can use the service `notify.google_assistant_sdk` to broadcast messages to G
 Example to broadcast to all speakers:
 
 ```yaml
-service: notify.google_assistant_sdk
+action: notify.google_assistant_sdk
 data:
   message: time for dinner
 ```
@@ -226,7 +239,7 @@ data:
 Example to broadcast to speakers in selected rooms:
 
 ```yaml
-service: notify.google_assistant_sdk
+action: notify.google_assistant_sdk
 data:
   message: time for dinner
   target:
@@ -242,6 +255,11 @@ Then you can converse with Google Assistant by tapping the Assist icon at the to
 
 ![Screenshot Conversation](/images/integrations/google_assistant_sdk/conversation.png)
 
-Or by calling the `conversation.process` service.
+Or by calling the `conversation.process` action.
 
 Note: due to a bug in the Google Assistant API, not all responses contain text, especially for home control commands, like turn on the lights. These will be shown as `<empty response>`. For those, Google Assistant responds with HTML and Home Assistant integrations are [not allowed](https://github.com/home-assistant/architecture/blob/master/adr/0004-webscraping.md) to parse HTML.
+
+
+## Removing the integration
+
+{% include integrations/remove_device_service.md %}

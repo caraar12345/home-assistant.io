@@ -8,19 +8,31 @@ ha_iot_class: Cloud Polling
 ha_domain: aladdin_connect
 ha_platforms:
   - cover
-  - diagnostics
   - sensor
-ha_integration_type: integration
+ha_integration_type: hub
 ha_codeowners:
-  - '@mkmer'
+  - '@swcloudgenie'
 ha_config_flow: true
-ha_quality_scale: platinum
+ha_dhcp: true
 ---
 
 The Aladdin Connect integration lets you control Genie Aladdin Connect garage doors through Home Assistant.
 
-<div class='note'>
+{% note %}
 Only doors that are owned by your Aladdin Connect account will be available. Doors that your account has been granted shared access to are not yet supported.
-</div>
+{% endnote %}
+
+## Prerequisites
+
+1. Open the app store and install the **AladdinConnect** app.
+2. Create an account.
+3. Add a device to the app.
+
 
 {% include integrations/config_flow.md %}
+
+## Removing the integration
+
+This integration follows standard integration removal. No extra steps are required.
+
+{% include integrations/remove_device_service.md %}

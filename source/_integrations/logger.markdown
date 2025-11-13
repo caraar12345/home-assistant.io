@@ -15,14 +15,14 @@ The `logger` integration lets you define the level of logging activities in Home
 Assistant.
 
 To enable the `logger` integration in your installation,
-add the following to your `configuration.yaml` file:
+add the following to your {% term "`configuration.yaml`" %} file:
 
 ```yaml
 # Example configuration.yaml entry
 logger:
 ```
 
-The log severity level is `warning` if the logger integration is not enabled in `configuration.yaml`.
+The log severity level is `warning` if the logger integration is not enabled in {% term "`configuration.yaml`" %}.
 
 To log all messages and ignore events lower than critical for specified
 integrations:
@@ -130,37 +130,37 @@ logger:
   logs:
     custom_components.my_integration: critical
   filters:
-    custom_component.my_integration:
+    custom_components.my_integration:
       - "HTTP 429" # Filter all HTTP 429 errors
       - "Request to .*unreliable.com.* Timed Out"
     homeassistant.components.nws:
       - "^Error handling request$"
 ```
 
-## Services
+## Actions
 
-### Service `set_default_level`
+### Action `set_default_level`
 
 You can alter the default log level (for integrations without a specified log
-level) using the service `logger.set_default_level`.
+level) using the `logger.set_default_level` action.
 
 An example call might look like this:
 
 ```yaml
-service: logger.set_default_level
+action: logger.set_default_level
 data:
   level: info
 ```
 
-### Service `set_level`
+### Action `set_level`
 
-You can alter log level for one or several integrations using the service
-`logger.set_level`. It accepts the same format as `logs` in the configuration.
+You can alter log level for one or several integrations using the `logger.set_level` action.
+It accepts the same format as `logs` in the configuration.
 
 An example call might look like this:
 
 ```yaml
-service: logger.set_level
+action: logger.set_level
 data:
   homeassistant.core: fatal
   homeassistant.components.mqtt: warning
@@ -171,12 +171,28 @@ data:
 
 ## Viewing logs
 
-The log information are stored in the
+The log information can be viewed and downloaded from {% my logs title="**Settings** > **System** > **Logs**" %}
+
+
+### Supervised installations
+
+On {% term "Home Assistant Supervisor" %} based installations, such as the
+{% term "Home Assistant Operating System" %} the logs can also be viewed
+by logging in through the [SSH add-on](/common-tasks/os/#installing-and-using-the-ssh-add-on) and running the following command:
+
+```bash
+ha core logs
+```
+
+### Non-Supervised installations
+
+For installations without the {% term "Home Assistant Supervisor" %}
+the log information is stored in the
 [configuration directory](/docs/configuration/) as `home-assistant.log`
 and you can read it with the command-line tool `cat` or follow it dynamically
 with `tail -f`.
 
-You can use the example below, when logged in through the [SSH add-on](/addons/ssh/):
+You can use the example below, when logged in through the [SSH add-on](/common-tasks/os/#installing-and-using-the-ssh-add-on):
 
 ```bash
 tail -f /config/home-assistant.log

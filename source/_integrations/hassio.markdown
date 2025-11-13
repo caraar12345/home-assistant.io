@@ -2,17 +2,21 @@
 title: Home Assistant Supervisor
 description: Control Supervisor Add-ons and OS from Home Assistant
 ha_category:
+  - Backup
   - Binary sensor
   - Sensor
+  - Switch
   - Update
 ha_iot_class: Local Polling
 ha_release: 0.42
 ha_domain: hassio
 ha_quality_scale: internal
 ha_platforms:
+  - backup
   - binary_sensor
   - diagnostics
   - sensor
+  - switch
   - update
 ha_codeowners:
   - '@home-assistant/supervisor'
@@ -20,8 +24,8 @@ ha_integration_type: integration
 ---
 
 Supervisor integration allows you to monitor and control Supervisor add-ons and operating system from Home Assistant.
-This integration is already installed if you run Home Assistant OS or Supervised. Please note that this integration
-cannot be installed on Home Assistant Container or Core (Python venv) installation types.
+This integration is already installed if you run {% term "Home Assistant Operating System" %}. Please note that this integration
+cannot be installed on {% term "Home Assistant Container" %}.
 
 ## Sensor entities
 
@@ -69,7 +73,7 @@ For Home Assistant Host, the following sensors are available:
 
 For each installed add-on Supervisor provides following binary sensors:
 
-(These entities are disabled by default and must be reenabled to appear)
+(These entities are disabled by default and must be re-enabled to appear)
 
 | Sensor | Enabled by default | Description |
 | ------- | ------------------ | ----------- |
@@ -82,65 +86,65 @@ For Home Assistant OS Supervisor provides following binary sensors:
 | ------- | ------------------ | ----------- |
 | Update Available | no | Whether there is an update available for OS
 
+## Switch entities
+
+For each installed add-on, the following switch is available:
+
+| Switch | Enabled by default | Description |
+| ------- | ------------------ | ----------- |
+| Running | no | Shows whether the add-on is running or not, and allows you to start or stop the add-on depending on its current state. |
+
 ## Update entities
 
 For all your installed add-ons, Home Assistant Core, Home Assistant Supervisor, and for the Home Assistant Operating System (if you are running that), this integration will provide [update](/integrations/update) entities that provide information about pending updates, and will allow you to update to them.
 
-## Services
+## Actions
 
-### Service hassio.addon_start
+### Action hassio.addon_start
 
 Start an add-on.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `addon` | no | Add-on slug
 
-### Service hassio.addon_stop
+### Action hassio.addon_stop
 
 Stop an add-on.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `addon` | no | Add-on slug
 
-### Service hassio.addon_restart
+### Action hassio.addon_restart
 
 Restart an add-on.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `addon` | no | Add-on slug
 
-### Service hassio.addon_stdin
+### Action hassio.addon_stdin
 
 Write data to add-on stdin.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `addon` | no | Add-on slug
 
-### Service hassio.addon_update
-
-Update add-on. This service should be used with caution since add-on updates can contain backward-incompatible changes. It is highly recommended that you review release notes/change logs before updating an add-on.
-
-| Service Data Attribute | Optional | Description |
-| ---------------------- | -------- | ----------- |
-| `addon` | no | Add-on slug
-
-### Service hassio.host_reboot
+### Action hassio.host_reboot
 
 Reboot the host system.
 
-### Service hassio.host_shutdown
+### Action hassio.host_shutdown
 
 Shutdown the host system.
 
-### Service hassio.backup_full
+### Action hassio.backup_full
 
 Create a full backup.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `name` | yes | By default, the current date and time are used in your local time, which you have set in your general settings.
 | `password` | yes | Optional password for backup
@@ -148,11 +152,11 @@ Create a full backup.
 | `location` | yes | Alternate backup location instead of using the default location for backups
 | `homeassistant_exclude_database` | yes | Exclude the Home Assistant database file from backup
 
-### Service hassio.backup_partial
+### Action hassio.backup_partial
 
 Create a partial backup.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `addons` | yes | List of add-on slugs to backup
 | `folders` | yes | List of directories to backup
@@ -163,20 +167,20 @@ Create a partial backup.
 | `homeassistant` | yes | Include Home Assistant and associated config in backup
 | `homeassistant_exclude_database` | yes | Exclude the Home Assistant database file from backup
 
-### Service hassio.restore_full
+### Action hassio.restore_full
 
 Restore from full backup.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `slug` | no | Slug of backup to restore from
 | `password` | yes | Optional password for backup
 
-### Service hassio.restore_partial
+### Action hassio.restore_partial
 
 Restore from partial backup.
 
-| Service Data Attribute | Optional | Description |
+| Data attribute | Optional | Description |
 | ---------------------- | -------- | ----------- |
 | `slug` | no | Slug of backup to restore from
 | `homeassistant` | yes | Whether to restore Home Assistant, `true` or `false`

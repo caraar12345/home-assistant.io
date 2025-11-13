@@ -9,6 +9,11 @@ ha_codeowners:
   - '@home-assistant/core'
 ha_domain: history
 ha_integration_type: system
+related:
+  - docs: /integrations/recorder/
+    title: Recorder integration
+  - url: https://data.home-assistant.io
+    title: Home Assistant Data Science Portal
 ---
 
 The **History** integration tracks everything that is going on within Home
@@ -39,7 +44,7 @@ You can access the **History** panel from the side bar. To export the data, foll
 
 By default, the recorder stores the sensor data for 10 days. Older data is purged automatically. The data for the last 10 days is taken from the recorder.
 
-If you select a time frame that exceeds 10 days, the data is taken from the long term statistics table. The long term statistics data is sampled and averaged once per hour, to save storage. Therefore, the values might look different from what you see from the recorder data, which shows the measured values at the sample rate defined for that sensor.
+If you select a time frame that exceeds 10 days, the data is taken from the long term statistics table. Long term statistics are saved for sensors with a state_class of measurement, total or total_increasing. The long term statistics data is sampled and averaged once per hour, to save storage. Therefore, the values might look different from what you see from the recorder data, which shows the measured values at the sample rate defined for that sensor. The detailed data will be shown with a darker line on graphs.
 
 <img class="no-shadow" src='/images/integrations/history/history-panel_including-long-term-storage.png' alt='If the chosen time frame exceeds the retention period defined in the recorder, the long term statistics table is used as a data source.'>
 
@@ -49,8 +54,3 @@ If you select a time frame that exceeds 10 days, the data is taken from the long
 
 The history information is also available through the
 [RESTful API](/developers/rest_api/#get-apihistory).
-
-## Related topics
-
-- [Recorder integration](/integrations/recorder/)
-- [Home Assistant Data Science Portal](https://data.home-assistant.io)
